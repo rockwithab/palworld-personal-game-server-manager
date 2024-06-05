@@ -15,14 +15,14 @@ sudo ./aws/install
 VHPW=$(echo $RANDOM | md5sum | head -c 20)
 
 #get stackname created by user data script and update SSM parameter name with this to make it unique
-STACKNAME=$(</tmp/mcParamName.txt)
-PARAMNAME=mcValheimPW-$STACKNAME
+STACKNAME=$(</tmp/bagParamName.txt)
+PARAMNAME=bagPalworldPW-$STACKNAME
 
 #put random string into parameter store as encrypted string value
 aws ssm put-parameter --name $PARAMNAME --value $VHPW --type "SecureString" --overwrite
 
 
-#install docker and valheim app on docker
+#install docker and palworld app on docker
 sudo apt install docker-ce docker-ce-cli containerd.io -y
 sudo apt install docker-compose -y
 sudo usermod -aG docker $USER
@@ -30,30 +30,18 @@ sudo mkdir /usr/games/serverconfig
 cd /usr/games/serverconfig
 sudo bash -c 'echo "version: \"3\"
 services:
-  valheim:
-    image: mbround18/valheim:latest
+  palworld:
+    image: mbround18/palworld-docker:latest
     ports:
-      - 2456:2456/udp
-      - 2457:2457/udp
-      - 2458:2458/udp
+      - 8211:8211 # Default game port
+      - 27015:27015 # steam query port
     environment:
-      - PORT=2456
-      - NAME="MyAWSGamingServer"
-      - WORLD="Dedicated"
-      - PASSWORD='"$VHPW"'
-      - TZ=Europe/London
-      - PUBLIC=1
-      - AUTO_UPDATE=1
-      - AUTO_UPDATE_SCHEDULE="0 1 * * *"
-      - AUTO_BACKUP=1
-      - AUTO_BACKUP_SCHEDULE="*/15 * * * *"
-      - AUTO_BACKUP_REMOVE_OLD=1
-      - AUTO_BACKUP_DAYS_TO_LIVE=3
-      - AUTO_BACKUP_ON_UPDATE=1
-      - AUTO_BACKUP_ON_SHUTDOWN=1
+      PRESET: normal # Options: casual, normal, hard
+      MULTITHREADING: true # Optional, Allows for multithreading the server.
+      WORK_SPEED_RATE: 2.0 # default is 1.0
+      PAL_EGG_DEFAULT_HATCHING_TIME: 1 # default is 24 hours
+      BUILD_OBJECT_DETERIORATION_DAMAGE_RATE: 0.5 # default is 1.0
     volumes:
-      - ./valheim/saves:/home/steam/.config/unity3d/IronGate/Valheim
-      - ./valheim/server:/home/steam/valheim
-      - ./valheim/backups:/home/steam/backups" >> docker-compose.yml'
+      - ./data:/home/steam/palworld" >> docker-compose.yml'
 echo "@reboot root (cd /usr/games/serverconfig/ && docker-compose up)" > /etc/cron.d/awsgameserver
 sudo docker-compose up

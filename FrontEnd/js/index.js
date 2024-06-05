@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: MIT-0
 
 // Defining async function taking in JWT and URL
-async function mcInfo(url, idToken) {
+async function bagInfo(url, idToken) {
 
-    //mcInfo
-    var mcInfodata = API_URL + "getinfo/" + query_string;
+    //bagInfo
+    var bagInfodata = API_URL + "getinfo/" + query_string;
     
     // Storing response
-    const response = await fetch(mcInfodata, {
+    const response = await fetch(bagInfodata, {
       method: 'get',
       headers: new Headers({
         'Authorization': idToken
@@ -33,29 +33,29 @@ function hideloader(data) {
 // Function to define innerHTML for HTML table
 async function show(data) {
     var instance = data[1]["Instances"][0];
-    document.getElementById('mcInfoDNS').innerHTML = instance["DomainName"];
-    document.getElementById('mcInfoState').innerHTML = instance["State"];
-    document.getElementById('mcInfoIP').innerHTML = instance["PublicIpAddress"];
-    document.getElementById('mcInfoType').innerHTML = instance["InstanceType"];
+    document.getElementById('bagInfoDNS').innerHTML = instance["DomainName"];
+    document.getElementById('bagInfoState').innerHTML = instance["State"];
+    document.getElementById('bagInfoIP').innerHTML = instance["PublicIpAddress"];
+    document.getElementById('bagInfoType').innerHTML = instance["InstanceType"];
 
     //Check if Domain exists and then lookup IP to see if it matches IP on console.
     //Show card as red if this doesn't match
     if (data[1]["Instances"][0]["DomainName"] != "") {
       var DomainName2IP = await dnsLookup(data[1]["Instances"][0]["DomainName"]);
       if (DomainName2IP != data[1]["Instances"][0]["PublicIpAddress"]) {
-        var dnsCard = document.getElementById('mcInfoDNS').parentNode;
+        var dnsCard = document.getElementById('bagInfoDNS').parentNode;
         dnsCard.style.backgroundColor = '#FF0000';
         dnsCard.style.opacity = '0.7';
       }
       else {
-        var dnsCard = document.getElementById('mcInfoDNS').parentNode;
+        var dnsCard = document.getElementById('bagInfoDNS').parentNode;
         dnsCard.style.backgroundColor = '#18BEFF';
         dnsCard.style.opacity = '1';
       }
     }
     else {
-      document.getElementById('mcInfoDNS').innerHTML = "Loading...";
-      var dnsCard = document.getElementById('mcInfoDNS').parentNode;
+      document.getElementById('bagInfoDNS').innerHTML = "Loading...";
+      var dnsCard = document.getElementById('bagInfoDNS').parentNode;
       dnsCard.style.backgroundColor = '#FF0000';
       dnsCard.style.opacity = '0.7';
     }
@@ -94,7 +94,7 @@ async function stopServer() {
 
   for (y=0; y<6; y++){
     await sleep(1000);
-    mcInfo(API_URL, jwt);
+    bagInfo(API_URL, jwt);
   }
 }
 
@@ -115,7 +115,7 @@ async function startServer() {
 
   for (y=0; y<6; y++){
     await sleep(1000);
-    mcInfo(API_URL, jwt);
+    bagInfo(API_URL, jwt);
   }
 }
 
@@ -137,7 +137,7 @@ async function resizeServer() {
 
   for (y=0; y<5; y++){
     await sleep(1000);
-    mcInfo(API_URL, jwt);
+    bagInfo(API_URL, jwt);
   }
 }
 
@@ -161,7 +161,7 @@ function sleep(ms) {
 }
 
 function updatelinks() {
-  document.getElementById("home").setAttribute("href", mcCloudfrontUrl);
+  document.getElementById("home").setAttribute("href", bagCloudfrontUrl);
   document.getElementById("server").setAttribute("href", "https://console.aws.amazon.com/ec2/v2/home?#Instances:search=" + tagValue); 
   document.getElementById("cfnstack").setAttribute("href", "https://console.aws.amazon.com/cloudformation/home?#/stacks?filteringStatus=active&filteringText=" + stackname + "&viewNested=true&hideStacks=false&stackId=");
 }
@@ -194,7 +194,7 @@ async function init() {
       console.log("False")
       Auth.federatedSignIn({
         provider: 'COGNITO',
-        domain: mcCognitoDomainName
+        domain: bagCognitoDomainName
         });     
       return false   
     }
@@ -219,7 +219,7 @@ async function init() {
 
   async function refreshData() {
     var jwt2 = await getJwt2()
-    return mcInfo(API_URL, jwt2);
+    return bagInfo(API_URL, jwt2);
   }
 
 
@@ -234,7 +234,7 @@ async function checkLogin() {
 function DoSignIn() {
   Auth.federatedSignIn({
     provider: 'COGNITO',
-    domain: mcCognitoDomainName
+    domain: bagCognitoDomainName
 });
 }
 

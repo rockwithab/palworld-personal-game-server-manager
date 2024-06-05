@@ -2,29 +2,29 @@
 // SPDX-License-Identifier: MIT-0
 
 //EDIT ONLY THESE VALUES
-var mcCloudfrontUrl = 'REPLACE-WITH-CFURL' //mcCloudfrontUrl
-var mcCognitoClientID = 'REPLACE-WITH-COGNITO' //mcCognitoClientID
-var mcCognitoDomainName = 'REPLACE-WITH-COGDOMAIN' //mcCognitoDomainName
-var mcCognitoPoolsId = 'REPLACE-WITH-POOLS-ID' //mcCognitoPoolsId
-var API_URL = 'REPLACE-WITH-APIURL'; //mcControlApiUrl
+var bagCloudfrontUrl = 'REPLACE-WITH-CFURL' //bagCloudfrontUrl
+var bagCognitoClientID = 'REPLACE-WITH-COGNITO' //bagCognitoClientID
+var bagCognitoDomainName = 'REPLACE-WITH-COGDOMAIN' //bagCognitoDomainName
+var bagCognitoPoolsId = 'REPLACE-WITH-POOLS-ID' //bagCognitoPoolsId
+var API_URL = 'REPLACE-WITH-APIURL'; //bagControlApiUrl
 
-const query_string = "?mctagname=REPLACE-WITH-IDTAGNAME&mctagvalue=REPLACE-WITH-IDTAGVALUE"
+const query_string = "?bagtagname=REPLACE-WITH-IDTAGNAME&bagtagvalue=REPLACE-WITH-IDTAGVALUE"
 var tagName = 'REPLACE-WITH-IDTAGNAME'
 var tagValue = 'REPLACE-WITH-IDTAGVALUE'
 var stackname = 'REPLACE-WITH-STACKNAME'
 //EDIT ONLY THESE VALUES
 
 var aws_auth_config = {
-  "aws_user_pools_id": mcCognitoPoolsId,
-  "aws_user_pools_web_client_id": mcCognitoClientID,
+  "aws_user_pools_id": bagCognitoPoolsId,
+  "aws_user_pools_web_client_id": bagCognitoClientID,
   "oauth": {
-      "domain": mcCognitoDomainName,
+      "domain": bagCognitoDomainName,
       "scope": [
           "openid",
           "aws.cognito.signin.user.admin"
       ],
-      "redirectSignIn": mcCloudfrontUrl + '/signed_in.html',
-      "redirectSignOut": mcCloudfrontUrl + '/logout.html',
+      "redirectSignIn": bagCloudfrontUrl + '/signed_in.html',
+      "redirectSignOut": bagCloudfrontUrl + '/logout.html',
       "responseType": "code"
   },
   "federationTarget": "COGNITO_USER_POOLS",
