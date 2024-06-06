@@ -12,14 +12,14 @@ sudo unzip awscliv2.zip
 sudo ./aws/install
 
 #create random string for password
-VHPW=$(echo $RANDOM | md5sum | head -c 20)
+PALPW=$(echo $RANDOM | md5sum | head -c 20)
 
 #get stackname created by user data script and update SSM parameter name with this to make it unique
 STACKNAME=$(</tmp/bagParamName.txt)
 PARAMNAME=bagPalworldPW-$STACKNAME
 
 #put random string into parameter store as encrypted string value
-aws ssm put-parameter --name $PARAMNAME --value $VHPW --type "SecureString" --overwrite
+aws ssm put-parameter --name $PARAMNAME --value $PALPW --type "SecureString" --overwrite
 
 
 #install docker and palworld app on docker
@@ -33,15 +33,29 @@ services:
   palworld:
     image: mbround18/palworld-docker:latest
     ports:
-      - 8211:8211 # Default game port
-      - 27015:27015 # steam query port
+      - 8211:8211/udp # Default game port
+      - 27015:27015/udp # steam query port
     environment:
-      PRESET: normal # Options: casual, normal, hard
-      MULTITHREADING: true # Optional, Allows for multithreading the server.
-      WORK_SPEED_RATE: 2.0 # default is 1.0
-      PAL_EGG_DEFAULT_HATCHING_TIME: 1 # default is 24 hours
-      BUILD_OBJECT_DETERIORATION_DAMAGE_RATE: 0.5 # default is 1.0
+      - PRESET=normal # Options: casual, normal, hard
+      - MULTITHREADING=true # Optional, Allows for multithreading the server.
+      - WORK_SPEED_RATE=2.0 # default is 1.0
+      - PAL_EGG_DEFAULT_HATCHING_TIME=1 # default is 24 hours
+      - BUILD_OBJECT_DETERIORATION_DAMAGE_RATE=0.5 # default is 1.0
+      - SERVER_PASSWORD='"$PALPW"'
     volumes:
-      - ./data:/home/steam/palworld" >> docker-compose.yml'
+      - ./data:/home/steam/palworld
+  backups:
+    image: mbround18/backup-cron:latest
+    environment:
+      - SCHEDULE=*/5 * * * *
+      - INPUT_FOLDER=/home/steam/palworld/Pal/Saved/
+      - OUTPUT_FOLDER=/home/steam/backups
+      - OUTPUT_USER=1000
+      - OUTPUT_GROUP=1000
+      - RETAIN_N_DAYS=5
+    volumes:
+      - ./data:/home/steam/palworld
+      - ./backups:/home/steam/backups
+    restart: unless-stopped" >> docker-compose.yml'
 echo "@reboot root (cd /usr/games/serverconfig/ && docker-compose up)" > /etc/cron.d/awsgameserver
 sudo docker-compose up
